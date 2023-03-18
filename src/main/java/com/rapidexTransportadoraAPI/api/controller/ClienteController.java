@@ -58,13 +58,21 @@ public class ClienteController {
 
         URI location = new URI("/clientes");
 
-        return ResponseEntity.created(location).body(clienteModelAssembler.toModel(cliente));
+        ClienteModel clienteModel = clienteModelAssembler.toModel(cliente);
+
+        return ResponseEntity.created(location).body(clienteModel);
     }
 
-    @PutMapping
-    public ResponseEntity<ClienteModel> atualizarCliente() {
+    @PutMapping("/{idCliente}")
+    public ResponseEntity<ClienteModel> atualizarCliente(@PathVariable Long idCliente, @RequestBody ClienteInput clienteInput) {
+        Cliente clienteAtual = clienteService.buscarPorId(idCliente);
 
+        clienteInputDisassembler.copyToDomainObject(clienteInput, clienteAtual);
 
-        return ResponseEntity.ok().body(null);
+        clienteAtual = clienteService.cadastrar(clienteAtual);
+
+        ClienteModel clienteModel = clienteModelAssembler.toModel(clienteAtual);
+
+        return ResponseEntity.ok().body(clienteModel);
     }
 }
